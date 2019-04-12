@@ -1,0 +1,27 @@
+{
+  "name": "node.js_introduction",
+  "version": "1.0.0",
+  "description": "Node.js_Introduction",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/kkato3297/WebAPI_Learning.git"
+  },
+  "keywords": [
+    "WebAPI_Learning",
+    "Node.js_Introduction"
+  ],
+  "author": "kkato3297",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kkato3297/WebAPI_Learning/issues"
+  },
+  "homepage": "https://github.com/kkato3297/WebAPI_Learning#readme",
+  "dependencies": {
+    "ejs": "^2.6.1"
+  }
+}
