@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/kkato3297/WebAPI_Learning#readme",
   "dependencies": {
-    "ejs": "^2.6.1"
+    "ejs": "^2.6.1",
+    "mongodb": "^3.2.3"
   }
 }
