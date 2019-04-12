@@ -17,11 +17,15 @@ function renderForm(posts, res) {
 server.on('request', function(req, res) {
 	if (req.method === 'POST') {
 		req.data = "";
-		req.on("readable", function() {
-			req.data += read.read();
+		// readable でなく data
+		req.on("data", function(chunk) {
+			// コールバック関数の引数を結合していく
+			req.data += chunk;
 		});
 		req.on("end", function() {
-			
+			var query = qs.parse(req.data);
+			posts.push(query.name);
+			renderForm(posts, res);
 		});
 	} else {
 		renderForm(posts, res);
