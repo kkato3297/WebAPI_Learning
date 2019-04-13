@@ -10,6 +10,8 @@
 - [エラーの対処法](#エラーの対処法)
 	- [npmでモジュールをインストールする際エラーメッセージが出る](#npmでモジュールをインストールする際エラーメッセージが出る)
 	- [MongoDBが起動しない](#MongoDBが起動しない)
+	- [Express入門においてdotinstallの方法で実施するとエラーが発生する](#Express入門においてdotinstallの方法で実施するとエラーが発生する)
+		- [&#35;20&nbsp;CSRF対策を施そう](#&#35;20&nbsp;CSRF対策を施そう)
 
 ---
 
@@ -105,4 +107,53 @@ $ npm init
 
 ```
 $ sudo service mongod start
+```
+
+### Express入門においてdotinstallの方法で実施するとエラーが発生する
+
+現在Express.jsの最新バージョンが「4.x」であるが、「3.x」で記述が変わっている個所があるので記述しておく。以下のサイトを参考にするとよい。
+
+参考URL：ドットインストール Express入門 Express 4.x でやる時のちがいまとめ。 - かもメモ
+https://chaika.hatenablog.com/entry/2015/10/08/171338
+
+また上記URLでも触れていない個所について追記しておく。
+
+#### #20 CSRF対策を施そう
+
+上記サイトでは以下のように修正するよう指摘されているが...
+
+```
+...
+
+app.use(cookieParser());
+app.use(expressSession({secret: 'secret_key'}));
+app.use(csrf());
+```
+
+コンソール上に以下のような警告が出てくる。
+
+```
+...
+
+Sat, 13 Apr 2019 23:30:00 JST express-session deprecated pass resave option; default value will change at lib\config\express.js:55:11
+Sat, 13 Apr 2019 23:30:00 JST express-session deprecated pass saveUninitialized option; default value will change at lib\config\express.js:55:11
+```
+
+どうやら省略可能のパラメータ`resave`と`saveUninitialized`のデフォルト値が近々変わると言っている。  
+そのため、以下のように`resave`と`saveUninitialized`を設定してあげることで警告が消える。
+
+追加したパラメータの意味は以下の通り。
+* `resave`: セッションにアクセスすると上書きされるオプション
+* `saveUninitialized`: 未初期化状態のセッションも保存するようなオプション
+
+```
+...
+
+app.use(cookieParser());
+app.use(expressSession({
+	secret: 'secret_key',
+	resave: true,			// ← ここ
+	saveUninitialized: true		// ← ここ
+}));
+app.use(csrf());
 ```
