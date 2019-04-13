@@ -1,0 +1,26 @@
+{
+  "name": "myapp",
+  "version": "1.0.0",
+  "description": "sample app for Expression.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/kkato3297/WebAPI_Learning.git"
+  },
+  "keywords": [
+    "Expression_Introduction",
+    "myapp"
+  ],
+  "author": "kkato3297",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kkato3297/WebAPI_Learning/issues"
+  },
+  "homepage": "https://github.com/kkato3297/WebAPI_Learning#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
