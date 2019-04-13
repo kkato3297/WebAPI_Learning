@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/kkato3297/WebAPI_Learning#readme",
   "dependencies": {
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "morgan": "^1.9.1"
   }
 }
