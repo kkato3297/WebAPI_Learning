@@ -49,5 +49,9 @@ app.get('/posts/:id/edit', post.edit);
 app.put('/posts/:id', post.update);
 app.delete('/posts/:id', post.destroy);
 
+app.use(function(err, req, res, next) {
+	res.send(err.message);
+});
+
 app.listen(3000);
 console.log("server starting...");
