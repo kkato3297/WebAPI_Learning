@@ -22,8 +22,10 @@
   "homepage": "https://github.com/kkato3297/WebAPI_Learning#readme",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "connect": "^3.6.6",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
+    "method-override": "^3.0.0",
     "morgan": "^1.9.1"
   }
 }
