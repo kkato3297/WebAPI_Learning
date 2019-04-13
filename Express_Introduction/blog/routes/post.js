@@ -8,5 +8,5 @@ exports.index = function(req, res) {
 	res.render('posts/index', {posts: posts});
 };
 exports.show = function(req, res) {
-	res.render('posts/show', {posts: posts[req.params.id]})
+	res.render('posts/show', {post: posts[req.params.id]})
 };
