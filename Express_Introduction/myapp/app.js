@@ -1,11 +1,21 @@
 var express = require('express'),
     app = express(),
-    logger = require('morgan');	// Express 4.x ではexpress.logger()は使えなくなっているので、morganを使用してログを出力する。
+    logger = require('morgan'),	// Express 4.x ではexpress.logger()は使えなくなっているので、morganを使用してログを出力する。
+    bodyParser = require('body-parser');	// Express 4.x ではexpress.json() / express.urlencoded()が使えないので、別途ミドルウェアをインストールして設定する必要がある
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 // middleware
+/*
+ * // Express 4.x未満では下記の通り
+ * app.use(express.json());
+ * app.use(express.urlencoded());
+ */
+// Express 4.xでは下記の通り
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+
 app.use(logger('dev'));
 // Express 4.xでは不要
 /*
@@ -14,16 +24,11 @@ app.use(logger('dev'));
  */
 app.use(express.static(__dirname + '/public'));
 
-app.param('id', function(req, res, next, id) {
-	var users = ['taguchi', 'fkoji', 'dotinstall'];
-	req.params.name = users[id];
-	next();
+app.get('/new', function(req, res) {
+	res.render('new');
 });
-app.get('/hello/:id', function(req, res) {
-	res.send('hello ' + req.params.name);
-});
-app.get('/bye/:id', function(req, res) {
-	res.send('bye ' + req.params.name);
+app.post('/create', function(req, res) {
+	res.send(req.body.name);
 });
 
 app.listen(3000);
