@@ -5,9 +5,13 @@
 	<title>Blog</title>
 </head>
 <body>
-<h1></h1>
+<h1>Posts</h1>
 <ul>
-<li></li>
+<% for (var i=0; i<posts.length; i++) { %>
+<li>
+	<a href="/posts/<%= i %>"><%= posts[i].title %></a>
+</li>
+<% } %>
 </ul>
 </body>
 </html>
