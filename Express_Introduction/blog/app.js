@@ -4,7 +4,10 @@ var express = require('express'),
     logger = require('morgan'),
     bodyParser = require('body-parser'),
     connect = require('connect'),
-    methodOverride = require('method-override');
+    methodOverride = require('method-override'),
+    cookieParser = require('cookie-parser'),
+    expressSession = require('express-session'),
+    csrf = require('csurf');
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
@@ -20,6 +23,19 @@ app.use(methodOverride(function(req, res){
 		return method;
 	}
 }));
+
+// csrf対策
+app.use(cookieParser());
+app.use(expressSession({
+	secret: 'secret_key',
+	resave: true,
+	saveUninitialized: true
+}));
+app.use(csrf());
+app.use(function(req, res, next) {
+	res.locals.csrftoken = req.csrfToken();
+	next();
+});
 
 app.use(logger('dev'));
 
