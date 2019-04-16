@@ -2,16 +2,18 @@
 
 ## 目次
 
-- [CentOS7への各種ソフトウェア(最新バージョン)の導入方法](#CentOS7への各種ソフトウェア(最新バージョン)の導入方法)
-	- [Node.js](#Node.js)
+- [CentOS7への各種ソフトウェア(最新バージョン)の導入方法](#centos7への各種ソフトウェア最新バージョンの導入方法)
+	- [Node.js](#nodejs)
 		- [手順](#手順)
-	- [MongoDB](#MongoDB)
-		- [手順](#手順)
+	- [MongoDB](#mongodb)
+		- [手順](#手順-1)
+	- [MySQL](#MySQL)
+		- [手順](#手順-2)
 - [エラーの対処法](#エラーの対処法)
 	- [npmでモジュールをインストールする際エラーメッセージが出る](#npmでモジュールをインストールする際エラーメッセージが出る)
-	- [MongoDBが起動しない](#MongoDBが起動しない)
-	- [Express入門においてdotinstallの方法で実施するとエラーが発生する](#Express入門においてdotinstallの方法で実施するとエラーが発生する)
-		- [&#35;20&nbsp;CSRF対策を施そう](#&#35;20&nbsp;CSRF対策を施そう)
+	- [dotinstallの方法でMongoDBが起動しない](#dotinstallの方法でmongodbが起動しない)
+	- [Express入門においてdotinstallの方法で実施するとエラーが発生する](#express入門においてdotinstallの方法で実施するとエラーが発生する)
+		- [&#35;20&nbsp;CSRF対策を施そう](#20-csrf対策を施そう)
 
 ---
 
@@ -83,6 +85,124 @@ https://docs.mongodb.com/manual/tutorial/install-mongodb-on-red-hat/
 3. バージョン確認
 	```
 	$ mongodb --version
+	```
+
+---
+
+### MySQL
+
+以下のサイトを参考に、現在の安定バージョンである「8.0」をインストールする。
+
+参考URL：
+1. MySQL 5.7 を CentOS 7 に yum インストールする手順 | WEB ARCH LABO  
+https://weblabo.oscasierra.net/installing-mysql57-centos7-yum/
+
+2. MySQL 8.0 初期設定覚書 - Qiita  
+https://qiita.com/nobu-maple/items/3849b2161a21f90ae298
+
+3. CentOS 7 　MySQL8.0 インストールと設定方法（CentOS 7.5） | さなころ…  
+https://sanakoro.com/post-721/
+
+4. MySQL :: Download MySQL Yum Repository  
+https://dev.mysql.com/downloads/repo/yum/
+
+#### 手順
+
+1. CentOS 7 には mariaDB という MySQL 互換のデータベースサーバーがデフォルトでインストールされている場合があるため、MySQL と競合しないようにアンインストール・データ削除を行う
+
+    ```
+	$ sudo yum remove mariadb-libs
+	$ sudo rm -rf /var/lib/mysql/
+	```
+
+2. 参考URL4へ以下の方法でアクセスし、rpmファイルへのURLをコピペする
+
+    赤枠で囲んだ個所の「Download」ボタンを押下
+    ![MySQL](./images/MySQL/0001.png)
+
+    赤枠で囲んだ「No thanks, just start my download.」リンクを右クリックし、
+    ![MySQL](./images/MySQL/0002.png)
+
+	以下のようにリポジトリ登録用rpmファイルへのURLをコピー（画像はChromeでの例）
+    ![MySQL](./images/MySQL/0003.png)
+
+3. MySQL 公式 yum リポジトリを追加する  
+
+    ```
+	$ sudo yum localinstall <2でコピーしたrpmのURL>
+	```
+
+4. インストール
+
+    ```
+	$ sudo yum -y install mysql-community-server
+	```
+
+5. バージョンの確認
+
+    ```
+	$ mysqld --version
+	/usr/sbin/mysqld  Ver 8.0.15 for Linux on x86_64 (MySQL Community Server - GPL)
+	```
+
+6. デーモン「mysqld」をサービスとして登録し、OS起動時に自動的にMySQL Serverが起動するようにする  
+また、今後の作業のため手動でデーモンを起動する
+
+    ```
+	# mysqld をサービスに登録
+	$ sudo systemctl enable mysqld.service
+	# 手動でデーモンを起動する
+	$ sudo systemctl start mysqld.service
+	```
+
+7. MySQLの初期パスワードを以下のコマンドで確認する
+
+    ```
+	$ grep 'temporary password' /var/log/mysqld.log
+	2018-06-20T10:54:28.112789Z 1 [Note] A temporary password is generated for root@localhost: <初期rootパスワード>
+	```
+
+8. 以下コマンドで初期登録を行う
+
+    ```
+	$ sudo mysql_secure_installation
+	```
+
+    上記コマンドでは以下の順で質問される
+	1. rootのパスワード  ->  <7で確認した初期パスワード>
+	2. rootのパスワード入力(2回)（英数字、大文字、記号（英数字以外）含む8文字以上のパスワード）
+	3. VALIDATE PASSWORD プラグインというプラグインを導入するか -> yと入力してEnter
+	4. 「LOW」= 0,「MEDIUM」= 1,「STRONG」= 2 から選択　-> 0,1,2のどれかを入力してEnter
+	5. パスワードを変更するか　-> yと入力してEnter
+	6. rootのパスワード入力(2回) (パスワードポリシーに沿ったパスワード）
+	7. このパスワードで確定して次に進んでいいか  ->  ｙと入力してEnter
+	8. 匿名ユーザを削除するか  ->  y と入力してEnter
+	9. リモートからのrootログインを禁止するか  ->  y と入力してEnter
+	10. テスト用の’test’データベースを削除するか  ->  y と入力してEnter
+	11. 設定をリロードして反映するか  ->  Y と入力してEnter
+
+9. MySQLへログイン
+
+    以下コマンドでログイン  
+	パスワードは8-2で設定したパスワード
+
+	```
+	$ mysql -u root -p
+	```
+
+10. パスワードポリシーの変更
+
+    MySQLコンソールで以下を実行
+
+	```
+	# VALIDATE PASSWORD プラグインを削除
+	mysql> uninstall plugin validate_password;
+	# パスワードポリシーを「LOW」に設定
+	mysql> set global validate_password.policy=LOW;
+	# パスワード文字数を「5」文字に設定
+	mysql> set global validate_password.length=5;
+	# 新しいパスワードを設定（以後、MySQLにログインする際はこのパスワードを使用）
+	mysql> set password = '<パスワードポリシーに則ったパスワード>';
 	```
 
 ---
