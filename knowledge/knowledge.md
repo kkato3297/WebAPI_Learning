@@ -7,8 +7,11 @@
 		- [手順](#手順)
 	- [MongoDB](#mongodb)
 		- [手順](#手順-1)
-	- [MySQL](#MySQL)
+	- [MySQL](#mysql)
 		- [手順](#手順-2)
+	- [phpMyAdmin](#phpmyadmin)
+		- [手順](#手順-3)
+		- [接続方法](#接続方法)
 - [エラーの対処法](#エラーの対処法)
 	- [npmでモジュールをインストールする際エラーメッセージが出る](#npmでモジュールをインストールする際エラーメッセージが出る)
 	- [dotinstallの方法でMongoDBが起動しない](#dotinstallの方法でmongodbが起動しない)
@@ -204,6 +207,100 @@ https://dev.mysql.com/downloads/repo/yum/
 	# 新しいパスワードを設定（以後、MySQLにログインする際はこのパスワードを使用）
 	mysql> set password = '<パスワードポリシーに則ったパスワード>';
 	```
+
+### phpMyAdmin
+
+以下のサイトを参考にphpMyAdminをインストールし、MySQLと連携する。
+
+参考URL：
+1. CentOS7でLAMP環境構築 - Qiita  
+https://qiita.com/Togattter/items/73dc114394e7267e3db3
+
+2. 【MySQL ver 8.0.12】phpmyadminにログインできなかった時の解消法 - Qiita  
+https://qiita.com/guru_taka/items/37603e196ca1c129328c
+
+3. Mysql 5.7* パスワードをPolicyに合わせるとめんどくさい件について - Qiita  
+https://qiita.com/keisukeYamagishi/items/d897e5c52fe9fd8d9273
+
+4. MySQL8.0以降で接続できない場合は「認証プラグイン」を変更する  
+https://www.petitmonte.com/database/mysql_authentication_plugin.html
+
+#### 手順
+
+1. EPEL(Extra Packages for Enterprise Linux)のリポジトリを追加
+
+	```
+	$ sudo yum install -y wget epel-release
+	$ cd /etc/yum.repos.d
+	$ sudo wget http://rpms.remirepo.net/enterprise/remi.repo
+	```
+
+2. phpAdminに必要なパッケージ(php、Apache HTTPD等...)をインストールする  
+(yumの依存解決機能により自動的にインストールされる)
+
+	```
+	$ sudo yum --enablerepo=remi,remi-php72 install -y php php-common php-mbstring phpMyAdmin
+	```
+
+3. デフォルトでローカルからのみアクセスが許可されているのでその制限を外す  
+デフォルト設定ではCentOSのIPアドレス(10.0.2.15、192.168.33.10)のサブネットマスク「10.0.2.0/24、192.168.33.0/24」環境下に存在する端末からしかアクセスできない  
+
+	```
+	$ sudo vi /etc/httpd/conf.d/phpMyAdmin.conf
+	```
+
+	```conf
+	<Directory /usr/share/phpMyAdmin/>
+		AddDefaultCharset UTF-8
+
+		<IfModule mod_authz_core.c>
+			# Apache 2.4
+			#Require local       #コメントアウト
+			AllowOverride all    #追加
+			Require all granted  #追加
+		</IfModule>
+		<IfModule !mod_authz_core.c>
+			# Apache 2.2
+			Order Deny,Allow
+			Deny from All
+			Allow from 127.0.0.1
+			Allow from ::1
+		</IfModule>
+	</Directory>
+	```
+
+4. Apache HTTPDをサービス登録・開始する
+
+	```
+	$ sudo systemctl enable httpd
+	$ sudo systemctl start httpd
+	```
+
+5. このままではMySQL8.0以降のパスワードの取り扱い方の変更により、[接続方法]の手法ではアクセスできない（正確にはログインできない）ため、パスワードポリシーを変更する。  
+(パスワードポリシーの設定はMySQLの章で設定した内容に準拠)
+
+	```
+	$ mysql -u root -p
+
+	# rootユーザーの認証方式を確認
+	mysql> SELECT user, host, plugin FROM mysql.user;
+
+	# plugin項目が「caching_sha2_password」となっていれば、「mysql_native_password」に変更する
+	mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '<MySQLログイン時に入力したパスワード>';
+
+	mysql> quit;
+
+	# mysqldを再起動
+	$ sudo systemctl restart mysqld
+	```
+
+#### 接続方法
+
+以下のURLでアクセスする
+
+```
+http://<IP>/phpMyAdmin/
+```
 
 ---
 
