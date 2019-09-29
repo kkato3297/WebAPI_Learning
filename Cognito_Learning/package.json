@@ -1,0 +1,19 @@
+{
+  "name": "Cognito_Learning",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "amazon-cognito-identity-js": "^3.0.15",
+    "aws-sdk": "^2.512.0",
+    "jsonwebtoken": "^8.5.1",
+    "jwk-to-pem": "^2.0.1",
+    "node-fetch": "^2.6.0",
+    "request": "^2.88.0"
+  }
+}

@@ -1,1 +1,4 @@
 **/node_modules/**/*
+
+# Cognito
+Cognito_Learning/config.js
